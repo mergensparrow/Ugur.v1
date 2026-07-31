@@ -33,6 +33,10 @@ jobs:
         working-directory: ugur_app
         run: flutter pub get
 
+      - name: Fix missing import
+        working-directory: ugur_app
+        run: sed -i "2i import '../models/models.dart';" lib/screens/favorites_screen.dart
+
       - name: Test project
         working-directory: ugur_app
         run: flutter test
