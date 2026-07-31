@@ -1,0 +1,48 @@
+name: Build Ugur APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download project
+        uses: actions/checkout@v4
+
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Unpack Ugur project
+        run: |
+          mkdir ugur_app
+          unzip ugur_flutter_v1_stage2.zip -d ugur_app
+
+      - name: Create Android files
+        working-directory: ugur_app
+        run: flutter create . --platforms=android --org tm.ugur --project-name ugur
+
+      - name: Install dependencies
+        working-directory: ugur_app
+        run: flutter pub get
+
+      - name: Test project
+        working-directory: ugur_app
+        run: flutter test
+
+      - name: Build APK
+        working-directory: ugur_app
+        run: flutter build apk --debug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Ugur-APK
+          path: ugur_app/build/app/outputs/flutter-apk/app-debug.apk
