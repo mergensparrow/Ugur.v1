@@ -23,7 +23,7 @@ jobs:
       - name: Unpack Ugur project
         run: |
           mkdir ugur_app
-          unzip ugur_flutter_v1_stage2.zip -d ugur_app
+          unzip ugur_flutter_v1_stage3.zip -d ugur_app
 
       - name: Create Android files
         working-directory: ugur_app
