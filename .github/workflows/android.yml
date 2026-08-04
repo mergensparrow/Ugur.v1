@@ -1,0 +1,57 @@
+name: Build Ugur Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ugur-android-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-debug-apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Validate clean Flutter project
+        run: python3 tool/validate_project.py
+
+      - name: Create Android platform
+        run: flutter create --platforms=android --org tm.ugur --project-name ugur .
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Run tests
+        run: flutter test
+
+      - name: Build debug APK
+        run: flutter build apk --debug
+
+      - name: Prepare named APK
+        shell: bash
+        run: |
+          cp build/app/outputs/flutter-apk/app-debug.apk \
+            build/app/outputs/flutter-apk/ugur-v1.6.1-build20-debug.apk
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: ugur-v1.6.1-build20-debug-apk
+          path: build/app/outputs/flutter-apk/ugur-v1.6.1-build20-debug.apk
+          if-no-files-found: error
+          retention-days: 14
