@@ -1,0 +1,61 @@
+name: Import Ugur Stage 18A
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/import-stage18a.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  import-project:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Unpack Stage 18A into repository
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          ZIP_FILE="$(find . -maxdepth 1 -type f -name 'ugur_flutter_v1_stage18a_clean_repository*.zip' -print -quit)"
+
+          if [ -z "$ZIP_FILE" ]; then
+            echo "Stage 18A ZIP was not found in the repository root."
+            exit 1
+          fi
+
+          rm -rf /tmp/ugur-stage18a
+          mkdir -p /tmp/ugur-stage18a
+          unzip -q "$ZIP_FILE" -d /tmp/ugur-stage18a
+
+          test -f /tmp/ugur-stage18a/pubspec.yaml
+          test -f /tmp/ugur-stage18a/lib/main.dart
+          test -f /tmp/ugur-stage18a/DESIGN_LOCK.json
+
+          rm -rf /tmp/ugur-stage18a/.github/workflows
+
+          rm -f "$ZIP_FILE"
+          cp -a /tmp/ugur-stage18a/. .
+
+      - name: Commit imported project
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add -A
+
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+
+          git commit -m "Import Ugur Stage 18A Flutter project"
+          git push
