@@ -1,0 +1,27 @@
+# Dart / Flutter generated files
+.dart_tool/
+.packages
+.pub/
+.flutter-plugins
+.flutter-plugins-dependencies
+build/
+coverage/
+
+# Generated platform folders (created by GitHub Actions)
+android/
+web/
+ios/
+linux/
+macos/
+windows/
+
+# Editors and operating systems
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+
+# Local environment files
+.env
+.env.*
